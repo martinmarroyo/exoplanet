@@ -1,0 +1,23 @@
+version: "3"
+services:
+  etl:
+    container_name: etl
+    build:
+      context: ./etl
+      dockerfile: Dockerfile
+    networks:
+      - local
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      ETL_USER: exoplanet
+      ETL_PASS: exoplanet
+    networks:
+      - local
+    ports:
+      - 8080:80
+networks:
+  local:

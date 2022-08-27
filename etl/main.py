@@ -3,8 +3,8 @@ import sys
 import logging
 import yaml
 from yaml.loader import SafeLoader
-from etl import ingestion as ig
-from etl import writer
+from utils import ingestion as ig
+from utils import writer
 
 def main():
     # Set up loggin and config file

@@ -3,7 +3,7 @@ import pyvo
 import pandas as pd
 import sqlalchemy as sql
 from hashlib import md5
-from etl import writer
+from utils import writer
 from datetime import datetime
 
 def get_data(url:str, query:str) -> pd.DataFrame:
