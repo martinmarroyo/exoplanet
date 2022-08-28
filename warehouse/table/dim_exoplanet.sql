@@ -27,5 +27,6 @@ CREATE TABLE IF NOT EXISTS dim_exoplanet(
         is_current BOOLEAN,
         current_as_of DATE,
         date_expired DATE,
+        external_link TEXT,
         PRIMARY KEY(planet_key)
 );

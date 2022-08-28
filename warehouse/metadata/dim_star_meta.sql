@@ -17,4 +17,3 @@ COMMENT ON COLUMN dim_star.magnetic_field IS 'Stellar magnetic field detected';
 COMMENT ON COLUMN dim_star.detected_disc IS '(direct imaging or IR excess) disc detected';
 COMMENT ON COLUMN dim_star.ra IS 'Right ascension of the host star';
 COMMENT ON COLUMN dim_star.dec IS 'Declination of the host star';
-COMMENT ON COLUMN dim_star.external_link IS 'Url of the planet page on exoplanet.eu';

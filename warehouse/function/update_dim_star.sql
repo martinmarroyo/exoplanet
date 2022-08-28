@@ -17,7 +17,7 @@ AS $BODY$
     arrive from the source database.
 */
 
-WITH star AS (
+WITH deduped_star AS (
     SELECT 
         star_name,
         star_distance,
@@ -38,19 +38,48 @@ WITH star AS (
         detected_disc,
         ra,
         dec,
-        external_link,
         modification_date::TIMESTAMP,
-        't'::BOOL AS is_current,
-        NOW()::DATE AS current_as_of
+        RANK() OVER (
+            PARTITION BY star_name
+            ORDER BY modification_date::TIMESTAMP DESC
+        ) AS recent
     FROM
         raw_exoplanet_data
+    WHERE
+        star_name<>''
+)
+, star AS (
+    SELECT 
+        star_name,
+        star_distance,
+        star_distance_error_min,
+        star_distance_error_max,
+        star_spec_type,
+        mag_v,
+        mag_i,
+        mag_j,
+        mag_h,
+        mag_k,
+        star_metallicity,
+        star_mass,
+        star_radius,
+        star_age,
+        star_teff,
+        magnetic_field,
+        detected_disc,
+        ra,
+        dec,
+        modification_date,
+        't'::BOOL AS is_current,
+        NOW()::DATE AS current_as_of
+    FROM deduped_star
     WHERE NOT EXISTS (
-        SELECT star_name, modification_date
-        FROM dim_star
-        WHERE is_current
-            AND star_name=raw_exoplanet_data.star_name
-            AND modification_date=raw_exoplanet_data.modification_date::TIMESTAMP
-    )
+    SELECT star_name, modification_date
+    FROM dim_star
+    WHERE is_current
+        AND star_name=deduped_star.star_name
+        AND modification_date=deduped_star.modification_date::TIMESTAMP
+    ) AND recent=1
 )
 , updates AS (
     -- Expire old rows
@@ -64,10 +93,10 @@ INSERT INTO dim_star(
     star_distance_error_max,star_spec_type,mag_v,
     mag_i,mag_j,mag_h,mag_k,star_metallicity,
     star_mass,star_radius,star_age,star_teff,
-    magnetic_field,detected_disc,ra,dec,external_link,
+    magnetic_field,detected_disc,ra,dec,
     modification_date,is_current, current_as_of
 )
-SELECT *
+SELECT DISTINCT *
 FROM star
 $BODY$;
 

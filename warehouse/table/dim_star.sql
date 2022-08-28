@@ -19,7 +19,6 @@ CREATE TABLE IF NOT EXISTS dim_star(
     detected_disc TEXT,
     ra DOUBLE PRECISION,
     dec DOUBLE PRECISION,
-    external_link TEXT,
     modification_date TIMESTAMP,
     is_current BOOLEAN,
     current_as_of DATE,
