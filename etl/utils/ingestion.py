@@ -1,10 +1,20 @@
 """Functions that ingest data from the Extrasolar Planets Encyclopedia API"""
+import logging
 import pyvo
 import pandas as pd
 import sqlalchemy as sql
 from hashlib import md5
 from utils import writer
 from datetime import datetime
+
+logging.basicConfig(level=logging.NOTSET)
+logger = logging.getLogger("ingestion")
+filehandler = logging.FileHandler("logs/etl.log")
+formatter = logging.Formatter("%(asctime)s: %(levelname)s|%(name)s: %(message)s")
+filehandler.setFormatter(formatter)
+logger = logging.getLogger("ingestion")
+logger.addHandler(filehandler)
+logger.setLevel(logging.INFO)
 
 def get_data(url:str, query:str) -> pd.DataFrame:
     """
@@ -57,19 +67,24 @@ def extract_updates(raw_data:pd.DataFrame, source_uuids:pd.Series) -> pd.DataFra
 def ingest(config:dict, engine:sql.engine) -> int:
     """Loads raw data into Exoplanet database table"""
     # Start the database engine & set up raw data
+    logger.info("Getting raw data from API...")
     raw_data = get_data(config["API_ENDPOINT"], config["API_QUERY"])
+    logger.info("Data successfully retrieved from API!")
     destination = config["SOURCE_NAME"]
-    # Check whether we are updating or doing an initial load
-    is_update = writer.table_exists(engine, destination)
-    # If we have an update, then extract the new records (if any)
+    # Check whether the source is empty (meaning an initial load) or not
+    logger.info("Checking source data...")
+    is_empty = writer.source_is_empty(config, engine)
     inserts = raw_data.copy()
-    if is_update:
+    # If we have an update (source is not empty), then extract the new records (if any)
+    if not is_empty:
+        logger.info("Preparing to update source data...")
         # Get uuids from source data
         source_uuids = get_source_uuids(engine, destination)
         # Extract new records only
         inserts = extract_updates(inserts, source_uuids)
+    logger.info(f"There are {len(inserts)} new records to add...")
     # Write to database
-    result = writer.write_to_db(
-        engine, inserts, destination, is_update
-    )
+    logger.info("Writing records to database...")
+    result = writer.write_to_db(engine, inserts, destination)
+    logger.info("Data has successfully been written to the database.")
     return result
