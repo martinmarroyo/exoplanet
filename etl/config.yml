@@ -1,5 +1,6 @@
 API_ENDPOINT: http://voparis-tap-planeto.obspm.fr/tap
 API_QUERY: SELECT * FROM exoplanet.epn_core
+HOST: warehouse
 USER: citizen_scientist
 PASS: exoplanetanalysis
 DRIVER: psycopg2
@@ -7,4 +8,4 @@ DIALECT: postgresql
 PORT: 5432
 DB_NAME: exoplanets
 SOURCE_NAME: raw_exoplanet_data
-TEST_DB: True
+TEST_DB: False

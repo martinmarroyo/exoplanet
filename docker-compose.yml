@@ -1,5 +1,6 @@
 version: "3"
 services:
+  # ETL worker
   etl:
     container_name: etl
     build:
@@ -7,17 +8,63 @@ services:
       dockerfile: Dockerfile
     networks:
       - local
+  # Frontend to run ETL & view other services
   frontend:
     container_name: frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    environment:
-      ETL_USER: exoplanet
-      ETL_PASS: exoplanet
+    env_file:
+      - environment
     networks:
       - local
     ports:
       - 8080:80
+  # Relational Database/Data Warehouse
+  database:
+    image: postgres:13
+    container_name: warehouse
+    env_file:
+        - environment
+    volumes:
+        - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+        test: [ "CMD", "pg_isready", "-U", "citizen_scientist"]
+        interval: 5s
+        retries: 5
+    restart: always
+    ports:
+        - "55432:5432"
+    networks:
+        - local
+  # Client Application for Database Management
+  pgadmin:
+    image: dpage/pgadmin4:6.10
+    container_name: pgadmin4
+    restart: always
+    env_file:
+        - environment
+    volumes:
+        - pgadmin-data:/var/lib/pgadmin
+    ports:
+        - "8800:80"
+    networks:
+        - local
+  # Business Intelligence/Dashboarding Tool
+  dashboard:
+    image: metabase/metabase
+    container_name: dashboard
+    env_file:
+        - environment
+    volumes:
+        - metabase-data:/metabase-data
+    ports:
+        - "3000:3000"
+    networks:
+        - local
 networks:
   local:
+volumes:
+  pgadmin-data:
+  postgres-data:
+  metabase-data:
