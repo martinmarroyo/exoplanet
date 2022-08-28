@@ -1,9 +1,9 @@
-HOST: localhost #warehouse
+HOST: warehouse
 USER: citizen_scientist
 PASS: exoplanetanalysis
 DRIVER: psycopg2
 DIALECT: postgresql
-PORT: 55432
+PORT: 5432
 DB_NAME: exoplanets
 SOURCE_NAME: raw_exoplanet_data
 TEST_DB: False
