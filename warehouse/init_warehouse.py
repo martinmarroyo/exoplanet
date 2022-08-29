@@ -9,8 +9,8 @@ from glob import glob
 
 logging.basicConfig(
     handlers=[
-        logging.FileHandler("logs/warehouse.log"),
         logging.StreamHandler(sys.stdout),
+        logging.FileHandler("logs/warehouse.log")
     ],
     level=logging.INFO,
     format="%(asctime)s  - %(levelname)s: %(message)s",

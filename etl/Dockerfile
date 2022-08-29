@@ -12,4 +12,5 @@ COPY requirements.txt .
 COPY main.py .
 COPY config.yml .
 RUN pip install -r requirements.txt
+RUN mkdir -p logs && touch logs/etl.log && chmod a+rwx logs/etl.log
 CMD ["/usr/sbin/sshd", "-D"]

@@ -1,9 +1,13 @@
-FROM alpine:3.16
+FROM python:3.9
 # Update current packages
-RUN apk update && apk upgrade
-# Install required programs
-RUN apk add python3 py3-pip
+RUN apt-get update && apt-get upgrade -y && \
+apt-get install -y ssh netcat iputils-ping && \
+mkdir ../var/run/sshd && \
+chmod 0755 ../var/run/sshd && \
+useradd -p $(openssl passwd -1 exoplanet) --create-home --shell /bin/bash --groups sudo exoplanet
 WORKDIR /warehouse
 COPY . .
 RUN pip install -r requirements.txt
-CMD ["python3", "init_warehouse.py"]
+RUN mkdir -p logs && touch logs/warehouse.log && chmod a+rwx logs/warehouse.log
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]

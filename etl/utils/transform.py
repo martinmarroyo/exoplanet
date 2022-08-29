@@ -1,4 +1,5 @@
 """Functions that support data warehouse transformations for Exoplanet data"""
+import sys
 import logging
 import psycopg2
 from utils import writer

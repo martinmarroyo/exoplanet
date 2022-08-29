@@ -8,6 +8,14 @@ services:
       dockerfile: Dockerfile
     networks:
       - local
+  # Warehouse Initialization worker
+  db_init:
+    container_name: db_init
+    build:
+      context: ./warehouse
+      dockerfile: Dockerfile
+    networks:
+      - local
   # Frontend to run ETL & view other services
   frontend:
     container_name: frontend

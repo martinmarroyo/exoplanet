@@ -1,4 +1,5 @@
 """Functions that ingest data from the Extrasolar Planets Encyclopedia API"""
+import sys
 import logging
 import pyvo
 import pandas as pd

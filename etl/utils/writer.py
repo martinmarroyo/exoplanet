@@ -1,4 +1,5 @@
 """Functions used to write data to the database"""
+import sys
 import logging
 import pandas as pd
 import sqlalchemy as sql
